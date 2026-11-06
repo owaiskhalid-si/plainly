@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: mypy
+      - run: pytest
+      - name: Build the package
+        run: |
+          python -m pip install build
+          python -m build
+      - name: Smoke-test the wheel
+        shell: bash
+        run: |
+          python -m pip install --force-reinstall dist/*.whl
+          plainly --version
+          plainly examples/clean.md --fail-under 90
+          plainly examples/slop.md --fail-under 0 --fail-on never --quiet
+
+  # Plainly lints its own README and docs with its own action.
+  prose:
+    name: Lint our own prose
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          paths: "README.md examples/clean.md"
+          fail-under: "85"
+      - name: Rules JSON matches the site
+        run: |
+          python -m pip install --quiet .
+          plainly rules --format json > /tmp/rules.json
+          diff <(python -c "import json;print(json.dumps(json.load(open('/tmp/rules.json')),sort_keys=True))") \
+               <(python -c "import json;print(json.dumps(json.load(open('site/rules.json')),sort_keys=True))") \
+            || { echo "::error::site/rules.json is stale; run python scripts/export_rules.py"; exit 1; }

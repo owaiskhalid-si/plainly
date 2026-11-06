@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plainly"
+version = "0.1.0"
+description = "A linter for prose that reads like a bot wrote it. Markdown-aware, zero dependencies, with safe auto-fixes, SARIF output and a GitHub Action."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Owais Khalid" }]
+keywords = ["lint", "prose", "writing", "markdown", "docs", "ai", "github-action", "sarif"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Documentation",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Text Processing :: Linguistic",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.4", "mypy>=1.10"]
+
+[project.scripts]
+plainly = "plainly.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/owaiskhalid-si/plainly"
+Source = "https://github.com/owaiskhalid-si/plainly"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+plainly = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.per-file-ignores]
+# Word lists, rule messages and test fixtures are prose; wrapping them helps nobody.
+"src/plainly/lexicon.py" = ["E501"]
+"src/plainly/rules/*.py" = ["E501"]
+"tests/*.py" = ["E501"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+files = ["src", "tests", "api/lint.py", "scripts/export_rules.py", "site/dev.py"]
+explicit_package_bases = true
+mypy_path = "src"
+
+# Plainly lints its own prose in CI (see .github/workflows/ci.yml).
+[tool.plainly]
+include = ["README.md", "examples/*.md", "docs/*.md"]
+fail-under = 0
+allow = ["Plainly"]

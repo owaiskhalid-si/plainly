@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plainly: a linter for prose that reads like a bot wrote it</title>
+  <meta name="description" content="Plainly lints Markdown and text for the habits of generated prose: stock words, throat-clearing, bold-label bullets, summary closers. Zero dependencies, safe auto-fixes, SARIF, a GitHub Action.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1a17'/%3E%3Cpath d='M9 24V8h7.5c3.6 0 5.5 2 5.5 4.9S20.1 18 16.5 18H12v6H9zm3-8.6h4.3c1.8 0 2.7-.9 2.7-2.5s-.9-2.4-2.7-2.4H12v4.9z' fill='%23f6f1e7'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <a class="wordmark" href="#">Plainly</a>
+    <nav>
+      <a href="#demo">Demo</a>
+      <a href="#rules">Rules</a>
+      <a href="#install">Install</a>
+      <a href="#action">Action</a>
+      <a class="gh" href="https://github.com/owaiskhalid-si/plainly" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <p class="kicker">A linter for prose</p>
+    <h1>Marks the sentences<br>a reader would skip.</h1>
+    <p class="lede">Plainly reads Markdown and plain text and flags the habits of generated writing: the stock words, the throat-clearing, the "not just X, but Y", the bold-label bullets, the "In conclusion". It scores the page, fixes what is safe to fix, and runs in your pull requests.</p>
+    <div class="cta">
+      <a class="btn primary" href="#demo">Try it on your text</a>
+      <code class="pip" data-copy="pip install git+https://github.com/owaiskhalid-si/plainly">pip install git+https://github.com/owaiskhalid-si/plainly <button type="button" aria-label="Copy">copy</button></code>
+    </div>
+    <ul class="facts">
+      <li><strong>25</strong> rules in four categories</li>
+      <li><strong>0</strong> dependencies, Python 3.11+</li>
+      <li><strong>5</strong> output formats incl. SARIF</li>
+      <li><strong>1</strong> line to add the GitHub Action</li>
+    </ul>
+  </section>
+
+  <section id="demo" class="demo">
+    <div class="demo-head">
+      <h2>Paste something.</h2>
+      <div class="samples">
+        <span>Samples:</span>
+        <button type="button" data-sample="generated" class="on">a generated article</button>
+        <button type="button" data-sample="plain">a plain note</button>
+        <button type="button" data-sample="readme">a README</button>
+      </div>
+    </div>
+    <div class="panes">
+      <div class="pane">
+        <div class="pane-bar">
+          <span>Your text</span>
+          <span class="muted" id="status">ready</span>
+        </div>
+        <textarea id="input" spellcheck="false" aria-label="Text to lint"></textarea>
+      </div>
+      <div class="pane">
+        <div class="pane-bar">
+          <span>Marked up</span>
+          <div class="legend">
+            <i class="tells"></i>tells <i class="padding"></i>padding <i class="structure"></i>structure <i class="clarity"></i>clarity
+          </div>
+        </div>
+        <div id="marked" class="marked" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="scoreboard">
+      <div class="score">
+        <div class="dial"><span id="score">–</span></div>
+        <div>
+          <div id="verdict" class="verdict">Waiting</div>
+          <div class="muted">score out of 100</div>
+        </div>
+      </div>
+      <dl class="stats">
+        <div><dt>Words</dt><dd id="words">–</dd></div>
+        <div><dt>Findings</dt><dd id="count">–</dd></div>
+        <div><dt>Tells / 1,000 words</dt><dd id="tells">–</dd></div>
+        <div><dt>Fixable</dt><dd id="fixable">–</dd></div>
+      </dl>
+      <div class="actions">
+        <button type="button" id="fix" class="btn primary">Apply the safe fixes</button>
+        <button type="button" id="reset" class="btn">Reset</button>
+      </div>
+    </div>
+    <ol id="findings" class="findings"></ol>
+  </section>
+
+  <section id="how" class="prose">
+    <h2>Why a linter, and not a detector</h2>
+    <p>Detectors guess whether a model wrote something and give you a percentage. Plainly does not care who wrote it. It points at the sentence and says what the habit is, why it reads as generated, and what to write instead. A person who writes "delve" four times gets the same note as a model that does, and both can act on it.</p>
+    <p>None of the patterns is wrong on its own. People write "robust", use em dashes, and end with a summary. The tell is the density, so the score is for the page and the findings are for the sentence. Code blocks, inline code, URLs and front matter are never prose, and a word in quotes is a mention, not a use.</p>
+  </section>
+
+  <section id="rules" class="rules">
+    <h2>The rules</h2>
+    <p class="muted">Every rule has a reason and an example. Three are opinions you opt into. The list below is generated from the code, so it cannot drift.</p>
+    <div id="rule-list"></div>
+  </section>
+
+  <section id="install" class="prose">
+    <h2>Install and run</h2>
+<pre><code>pip install git+https://github.com/owaiskhalid-si/plainly
+
+plainly                        <span class="c"># every .md, .mdx and .txt under the current folder</span>
+plainly docs/ README.md
+plainly --fix docs/            <span class="c"># apply the safe fixes in place</span>
+plainly --diff docs/           <span class="c"># show them as a patch first</span>
+plainly --changed origin/main  <span class="c"># only what this branch touched</span>
+git log -1 --format=%B | plainly --stdin   <span class="c"># a commit message</span>
+plainly --format sarif -o plainly.sarif    <span class="c"># github, json, sarif, markdown</span>
+plainly rules                  <span class="c"># and: plainly explain tells/em-dash</span></code></pre>
+    <p>Configure it in <code>plainly.toml</code> or <code>[tool.plainly]</code> in <code>pyproject.toml</code>: which files, the score to fail under, words your project uses on purpose, rules to switch on or off, per-rule options and severities. <code>plainly --write-baseline</code> lets an old project adopt it without fixing every page first.</p>
+<pre><code>include = ["**/*.md", "docs/**/*.txt"]
+fail-under = 60
+allow = ["robust"]
+enable = ["clarity/passive"]
+
+[rules."clarity/long-sentence"]
+max-words = 40</code></pre>
+  </section>
+
+  <section id="action" class="prose">
+    <h2>In your pull requests</h2>
+    <p>The GitHub Action annotates the changed lines, writes a score table to the job summary, and can send the findings to code scanning with one-click fixes.</p>
+<pre><code>- uses: actions/checkout@v4
+  with: { fetch-depth: 0 }
+- uses: owaiskhalid-si/plainly@main
+  with:
+    changed-since: origin/${{ github.base_ref }}
+    fail-under: "60"
+    sarif: "true"</code></pre>
+    <p>There is a <code>pre-commit</code> hook too, and the same engine runs this page's demo as a small Python function.</p>
+  </section>
+
+  <footer>
+    <p>Plainly is MIT-licensed and built by <a href="https://github.com/owaiskhalid-si" rel="noopener">Owais Khalid</a>. A demo project: the text you paste is linted and not stored.</p>
+  </footer>
+
+  <template id="rule-card">
+    <article class="rule">
+      <header>
+        <code class="id"></code>
+        <span class="chips"></span>
+      </header>
+      <h3></h3>
+      <p class="summary"></p>
+      <details>
+        <summary>Why, and an example</summary>
+        <p class="why"></p>
+        <div class="example">
+          <div><span class="label">before</span><p class="before"></p></div>
+          <div><span class="label">after</span><p class="after"></p></div>
+        </div>
+      </details>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+- id: plainly
+  name: plainly
+  description: "Lint Markdown and text for prose that reads like a bot wrote it."
+  entry: plainly
+  language: python
+  types_or: [markdown, text]
+  require_serial: true
+- id: plainly-fix
+  name: plainly --fix
+  description: "Apply Plainly's safe fixes to staged Markdown and text files."
+  entry: plainly --fix
+  language: python
+  types_or: [markdown, text]
+  require_serial: true

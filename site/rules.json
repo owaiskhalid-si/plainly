@@ -1,0 +1,489 @@
+[
+  {
+    "id": "clarity/jargon",
+    "name": "Business jargon",
+    "category": "clarity",
+    "summary": "'Paradigm shift', 'low-hanging fruit', 'move the needle', 'going forward', 'thought leader'.",
+    "why": "Jargon is a way of sounding like the room instead of saying something to it.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "Going forward, we'll circle back on the low-hanging fruit.",
+        "after": "From now on, we'll start with the easy wins."
+      }
+    ]
+  },
+  {
+    "id": "clarity/passive",
+    "name": "Passive voice",
+    "category": "clarity",
+    "summary": "'The file is read by the parser' where 'The parser reads the file' would do. Off by default.",
+    "why": "Passives are fine when the actor does not matter ('the server was restarted'). This rule is a prompt, not a verdict, so it is off by default and info-level when on.",
+    "severity": "info",
+    "enabled": false,
+    "fixable": false,
+    "options": {
+      "max-per-hundred-words": 0
+    },
+    "examples": [
+      {
+        "before": "The config is loaded by the CLI before the rules are run.",
+        "after": "The CLI loads the config before it runs the rules."
+      }
+    ]
+  },
+  {
+    "id": "clarity/long-sentence",
+    "name": "Long sentence",
+    "category": "clarity",
+    "summary": "A sentence over the word limit (35 by default).",
+    "why": "Long sentences are not wrong, but past 35 words most readers lose the subject. Headings and bullets are exempt.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "max-words": 35
+    },
+    "examples": [
+      {
+        "before": "The parser, which was rewritten last year to handle the new format that the vendor introduced without notice, now runs twice as fast as before, although memory use went up and the team that maintains it has grown from two people to five.",
+        "after": "The parser was rewritten last year for the vendor's new format. It now runs twice as fast, though memory use went up. The team maintaining it grew from two people to five."
+      }
+    ]
+  },
+  {
+    "id": "clarity/nominalisation",
+    "name": "Verb turned noun",
+    "category": "clarity",
+    "summary": "'The implementation of X' for 'implementing X', 'the creation of' for 'creating'.",
+    "why": "The verb is hiding inside the noun. Letting it out makes the sentence shorter and says who did what.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "The implementation of caching led to the reduction of latency.",
+        "after": "Caching reduced latency."
+      }
+    ]
+  },
+  {
+    "id": "clarity/double-word",
+    "name": "Doubled word",
+    "category": "clarity",
+    "summary": "'the the', 'is is': a word typed twice.",
+    "why": "A real typo that spell-checkers miss. Words that can legitimately double ('had had', 'that that') are skipped.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "Run the the tests before you push.",
+        "after": "Run the tests before you push."
+      }
+    ]
+  },
+  {
+    "id": "clarity/readability",
+    "name": "Hard to read",
+    "category": "clarity",
+    "summary": "A paragraph whose Flesch-Kincaid grade is above the limit (14 by default). Off by default.",
+    "why": "Reading-grade formulas count syllables and sentence length, so they punish long words even when they are the right words. Useful for marketing copy and support docs; noisy for technical reference. Off by default.",
+    "severity": "info",
+    "enabled": false,
+    "fixable": false,
+    "options": {
+      "max-grade": 14,
+      "min-words": 30
+    },
+    "examples": [
+      {
+        "before": "The utilisation of asynchronous invocation methodologies necessitates comprehensive reconsideration of exception-propagation semantics throughout heterogeneous distributed infrastructures, particularly regarding idempotency guarantees, compensating-transaction orchestration and the observability instrumentation that operational personnel require for diagnosing intermittent failures.",
+        "after": "Async calls change how errors travel, so the error handling needs a rethink. Retries must be safe to repeat, failed steps need an undo, and the on-call engineer needs enough logging to find a failure that only happens sometimes."
+      }
+    ]
+  },
+  {
+    "id": "padding/throat-clearing",
+    "name": "Throat-clearing",
+    "category": "padding",
+    "summary": "'It is important to note that', 'Needless to say', 'Basically,': a run-up before the sentence starts.",
+    "why": "The sentence after the phrase is the sentence. Deleting the run-up never changes the meaning, which is why the fix is automatic.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "It is important to note that the cache expires after an hour.",
+        "after": "The cache expires after an hour."
+      },
+      {
+        "before": "Needless to say, backups matter.",
+        "after": "Backups matter."
+      }
+    ]
+  },
+  {
+    "id": "padding/wordy",
+    "name": "Wordy phrase",
+    "category": "padding",
+    "summary": "A long way of saying a short thing: 'in order to', 'utilize', 'prior to', 'due to the fact that'.",
+    "why": "Each of these has a one-word equivalent that every reader knows. The fix swaps it in.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "In order to utilize the API prior to launch, contact support.",
+        "after": "To use the API before launch, contact support."
+      }
+    ]
+  },
+  {
+    "id": "padding/vague-quantity",
+    "name": "Vague quantity",
+    "category": "padding",
+    "summary": "'Numerous', 'a myriad of', 'a variety of', 'various': a quantity that avoids saying how many.",
+    "why": "A number is more useful than 'numerous'. When you do not have the number, 'many' or 'several' is at least honest about it.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "We fixed numerous bugs across a variety of modules.",
+        "after": "We fixed 14 bugs in the auth and billing modules."
+      }
+    ]
+  },
+  {
+    "id": "padding/intensifier",
+    "name": "Empty intensifier",
+    "category": "padding",
+    "summary": "'Very', 'really', 'truly', 'incredibly', 'extremely': words that make the next word weaker.",
+    "why": "'Very fast' is slower than 'fast'. If the word needs propping up, pick a better word or give the measurement.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "The migration was very slow and really painful.",
+        "after": "The migration took nine hours."
+      }
+    ]
+  },
+  {
+    "id": "padding/double-hedge",
+    "name": "Double hedge",
+    "category": "padding",
+    "summary": "Two hedges in a row: 'may potentially', 'could possibly', 'seems to perhaps'.",
+    "why": "One hedge is a judgement. Two is a writer who has not decided.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "This change may potentially affect older clients.",
+        "after": "This change may affect older clients."
+      }
+    ]
+  },
+  {
+    "id": "structure/bold-lead-bullets",
+    "name": "Bold-label bullets",
+    "category": "structure",
+    "summary": "A run of bullets that each start with a bold label and a colon: '**Speed:** it is fast.'",
+    "why": "This is the default shape of a generated answer: a list where each item is a heading in disguise. Three or more in a row almost always read better as sentences, or as a table if the labels are real columns.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "min": 3
+    },
+    "examples": [
+      {
+        "before": "- **Speed:** responses in under 50 ms\n- **Cost:** free for 10k requests\n- **Support:** email only",
+        "after": "Responses come back in under 50 ms. The first 10k requests are free. Support is by email."
+      }
+    ]
+  },
+  {
+    "id": "structure/same-opener",
+    "name": "Same opener",
+    "category": "structure",
+    "summary": "Three or more sentences in a row (or paragraphs, or bullets) that start with the same word.",
+    "why": "Anaphora is a device; by accident it is a drone. Common function words are ignored.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "min": 3,
+      "ignore": [
+        "i",
+        "the",
+        "a",
+        "an",
+        "if",
+        "when",
+        "you",
+        "we",
+        "it",
+        "this"
+      ]
+    },
+    "examples": [
+      {
+        "before": "Caching reduces load. Caching also hides latency. Caching can serve stale data.",
+        "after": "Caching reduces load and hides latency, at the price of serving stale data."
+      }
+    ]
+  },
+  {
+    "id": "structure/sentence-rhythm",
+    "name": "Flat rhythm",
+    "category": "structure",
+    "summary": "A paragraph whose sentences are all about the same length.",
+    "why": "People write long sentences and then short ones. Generated prose tends to settle on one length. This rule measures the spread of sentence lengths in a paragraph and flags the flat ones.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "min-sentences": 5,
+      "max-variation": 0.22
+    },
+    "examples": [
+      {
+        "before": "The cache stores recent pages. The cache expires them hourly. The cache ignores logged-in users. The cache lives in Redis. The cache is optional.",
+        "after": "The cache stores recent pages and expires them hourly. Logged-in users bypass it. It lives in Redis, and it is optional."
+      }
+    ]
+  },
+  {
+    "id": "structure/emoji-heading",
+    "name": "Emoji in heading",
+    "category": "structure",
+    "summary": "A heading with an emoji in it: '\ud83d\ude80 Getting started'.",
+    "why": "Emoji headings are a README fashion that generated READMEs copy wholesale. They also break anchors and screen readers.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "## \ud83d\ude80 Getting started",
+        "after": "## Getting started"
+      }
+    ]
+  },
+  {
+    "id": "structure/sign-off",
+    "name": "Sign-off",
+    "category": "structure",
+    "summary": "'Happy coding!', 'Stay tuned', 'I hope this helps', 'Feel free to reach out': a wave at the door.",
+    "why": "A piece ends when the information ends. Generated text adds a goodbye.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "That's it! Happy coding, and feel free to reach out with questions.",
+        "after": "(end on the last useful sentence)"
+      }
+    ]
+  },
+  {
+    "id": "structure/question-heading",
+    "name": "Question heading",
+    "category": "structure",
+    "summary": "A heading phrased as a question: 'What is a reverse proxy?', 'Why does this matter?'",
+    "why": "Search-engine articles ask the question in the heading so the engine matches it. Readers prefer the answer. Off by default; FAQ pages are a fair use.",
+    "severity": "info",
+    "enabled": false,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "## What is a reverse proxy?",
+        "after": "## Reverse proxies"
+      }
+    ]
+  },
+  {
+    "id": "tells/vocabulary",
+    "name": "Model vocabulary",
+    "category": "tells",
+    "summary": "Words and phrases language models use far more than people do: delve, tapestry, testament, realm, seamless, robust, crucial, embark, leverage.",
+    "why": "One of these words in a long piece is nothing. A handful per page is the single most reliable sign that nobody chose the words. The score tracks the density; each hit shows a plainer choice.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": true,
+    "options": {
+      "allow": []
+    },
+    "examples": [
+      {
+        "before": "Let's delve into the robust, seamless architecture.",
+        "after": "Here is how the architecture handles failure."
+      },
+      {
+        "before": "This tool is a testament to the power of automation.",
+        "after": "This tool saves the team two hours a week."
+      }
+    ]
+  },
+  {
+    "id": "tells/opener-cliche",
+    "name": "Clich\u00e9d opener",
+    "category": "tells",
+    "summary": "A paragraph that starts the way generated articles start: 'In today's fast-paced world', 'Have you ever wondered', 'In this article, we will'.",
+    "why": "The first sentence is the one readers use to decide whether to keep going. These openers tell them nothing.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "In today's fast-paced digital landscape, caching matters more than ever.",
+        "after": "Caching cut our p95 latency from 900 ms to 120 ms."
+      },
+      {
+        "before": "In this article, we will explore how to set up a reverse proxy.",
+        "after": "A reverse proxy in front of the app does three jobs."
+      }
+    ]
+  },
+  {
+    "id": "tells/summary-closer",
+    "name": "Summary closer",
+    "category": "tells",
+    "summary": "'In conclusion', 'Overall', 'Ultimately', 'At the end of the day': announcing the end instead of ending.",
+    "why": "Readers can see the last paragraph. If it is a summary, it is a summary without the label; if it is not, the label is false.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": true,
+    "options": {},
+    "examples": [
+      {
+        "before": "In conclusion, caching is a powerful tool that every team should consider.",
+        "after": "Cache the catalogue, not the cart."
+      },
+      {
+        "before": "Ultimately, the choice depends on your needs.",
+        "after": "Pick Postgres unless you need the document model."
+      }
+    ]
+  },
+  {
+    "id": "tells/setup-fragment",
+    "name": "Set-up fragment",
+    "category": "tells",
+    "summary": "A drumroll before the point: 'Here's the thing.', 'The best part?', 'Spoiler:', 'Let that sink in.'",
+    "why": "A one-beat fragment that promises a reveal is a social-media habit models copied. The point is stronger without the pause.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "The best part? It runs offline.",
+        "after": "It runs offline."
+      },
+      {
+        "before": "Here's the thing: nobody reads the changelog.",
+        "after": "Nobody reads the changelog."
+      }
+    ]
+  },
+  {
+    "id": "tells/not-just-but",
+    "name": "'Not just X, but Y'",
+    "category": "tells",
+    "summary": "The contrast frame models lean on: 'not just a tool, but a partner', 'it's not about speed; it's about trust', 'more than just'.",
+    "why": "The frame sets up a straw man (X) to knock down. Say Y.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "This isn't just a linter; it's a writing partner.",
+        "after": "This linter marks the sentences a reader would skip."
+      },
+      {
+        "before": "Testing is not only about catching bugs, but also about confidence.",
+        "after": "Tests catch bugs and let you refactor without fear."
+      }
+    ]
+  },
+  {
+    "id": "tells/rhetorical-question",
+    "name": "Rhetorical question and answer",
+    "category": "tells",
+    "summary": "A question the writer answers in the next breath: 'Why? Because...', 'The answer is simple.', 'So what does this mean?'",
+    "why": "A question nobody asked, answered by the person who asked it, is a stall. State the answer.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {},
+    "examples": [
+      {
+        "before": "Why does this matter? Because downtime costs money.",
+        "after": "Downtime costs money: about $400 a minute for this shop."
+      },
+      {
+        "before": "So what is the catch? The answer is simple: memory.",
+        "after": "The catch is memory."
+      }
+    ]
+  },
+  {
+    "id": "tells/em-dash",
+    "name": "Em-dash habit",
+    "category": "tells",
+    "summary": "Too many em dashes for the length of the text. People use them; models use them in every paragraph.",
+    "why": "An em dash is fine. Four per thousand words is a habit, and the habit is one of the easiest tells to spot. Commas, full stops and parentheses do the same jobs.",
+    "severity": "warning",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "per-thousand": 4,
+      "min": 3
+    },
+    "examples": [
+      {
+        "before": "Caching helps \u2014 a lot \u2014 but only when the data is stable \u2014 which it rarely is.",
+        "after": "Caching helps, but only when the data is stable, and it rarely is."
+      }
+    ]
+  },
+  {
+    "id": "tells/triad",
+    "name": "Triad habit",
+    "category": "tells",
+    "summary": "Three-item lists of single words ('fast, reliable, and scalable') showing up again and again.",
+    "why": "The rule of three is a real rhetorical device. Used in every other sentence it becomes a drumbeat, and each item in the triad is usually an adjective that could have been a fact.",
+    "severity": "info",
+    "enabled": true,
+    "fixable": false,
+    "options": {
+      "per-thousand": 6,
+      "min": 3
+    },
+    "examples": [
+      {
+        "before": "The API is fast, simple, and secure. Setup is quick, painless, and free. The docs are short, clear, and kind.",
+        "after": "The API answers in under 50 ms. Setup takes one command. The docs fit on one page."
+      }
+    ]
+  }
+]

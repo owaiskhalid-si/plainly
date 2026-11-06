@@ -1,0 +1,101 @@
+name: "Plainly"
+description: "Lint Markdown and text for prose that reads like a bot wrote it. Annotates the diff, writes a job summary, and can upload SARIF to code scanning."
+author: "Owais Khalid"
+branding:
+  icon: "edit-3"
+  color: "green"
+
+inputs:
+  paths:
+    description: "Files or folders to lint, space-separated. Ignored when changed-since is set."
+    required: false
+    default: "."
+  changed-since:
+    description: "Lint only files changed since this git ref (for example origin/main). Needs fetch-depth: 0 on checkout."
+    required: false
+    default: ""
+  fail-under:
+    description: "Fail when any file scores below this (0–100). Overrides the config file."
+    required: false
+    default: ""
+  fail-on:
+    description: "Fail at this severity or above: error, warning, info or never. Overrides the config file."
+    required: false
+    default: ""
+  args:
+    description: "Extra command-line arguments, for example --select tells --ignore structure/emoji-heading."
+    required: false
+    default: ""
+  sarif:
+    description: "Upload a SARIF report to GitHub code scanning (needs security-events: write)."
+    required: false
+    default: "false"
+  summary:
+    description: "Write a score table to the job summary."
+    required: false
+    default: "true"
+  python-version:
+    description: "Python version to run with."
+    required: false
+    default: "3.12"
+
+outputs:
+  score:
+    description: "Average score across the linted files, 0–100."
+    value: ${{ steps.lint.outputs.score }}
+  findings:
+    description: "Number of findings."
+    value: ${{ steps.lint.outputs.findings }}
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Plainly
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+
+    - name: Lint
+      id: lint
+      shell: bash
+      env:
+        PATHS: ${{ inputs.paths }}
+        CHANGED: ${{ inputs.changed-since }}
+        FAIL_UNDER: ${{ inputs.fail-under }}
+        FAIL_ON: ${{ inputs.fail-on }}
+        EXTRA: ${{ inputs.args }}
+        WANT_SARIF: ${{ inputs.sarif }}
+        WANT_SUMMARY: ${{ inputs.summary }}
+      run: |
+        set -o pipefail
+        args=()
+        if [ -n "$CHANGED" ]; then args+=(--changed "$CHANGED"); else read -r -a paths <<< "$PATHS"; args+=("${paths[@]}"); fi
+        [ -n "$FAIL_UNDER" ] && args+=(--fail-under "$FAIL_UNDER")
+        [ -n "$FAIL_ON" ] && args+=(--fail-on "$FAIL_ON")
+        read -r -a extra <<< "$EXTRA"; args+=("${extra[@]}")
+
+        # One run for the exit code and the JSON (score, counts); the other formats are derived from the same files.
+        status=0
+        plainly "${args[@]}" --format json --output plainly-report.json || status=$?
+        if [ ! -s plainly-report.json ]; then echo "::error::Plainly did not produce a report"; exit "$status"; fi
+        python - <<'PY' >> "$GITHUB_OUTPUT"
+        import json
+        data = json.load(open("plainly-report.json", encoding="utf-8"))
+        print(f"score={data['averageScore']}")
+        print(f"findings={data['findings']}")
+        PY
+        plainly "${args[@]}" --format github --fail-on never --fail-under 0 || true
+        if [ "$WANT_SUMMARY" = "true" ]; then plainly "${args[@]}" --format markdown --fail-on never --fail-under 0 >> "$GITHUB_STEP_SUMMARY" || true; fi
+        if [ "$WANT_SARIF" = "true" ]; then plainly "${args[@]}" --format sarif --fail-on never --fail-under 0 --output plainly.sarif || true; fi
+        exit "$status"
+
+    - name: Upload SARIF
+      if: ${{ inputs.sarif == 'true' && always() && hashFiles('plainly.sarif') != '' }}
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: plainly.sarif
+        category: plainly
+      continue-on-error: true
